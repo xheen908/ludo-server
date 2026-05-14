@@ -1,0 +1,15 @@
+services:
+  ludo-server:
+    build: .
+    container_name: ludo-backend
+    restart: unless-stopped
+    ports:
+      - "8888:8888"
+    environment:
+      - NODE_ENV=production
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared-tunnel
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token eyJhIjoiMTBjOTEwOWU5ZTM0MmUyYjRmYzU1ZTcxZGRmOTFjMTciLCJ0IjoiNTkzZTVhMzktYTc2Ni00NDhlLWI5OTAtNDA0M2Y1ZDNhZDVkIiwicyI6Ik1UQTNaVFprTkdRdFlXRmtOeTAwWW1NekxXSTJNell0TldabFl6Y3lPVFJpWmpZMSJ9
