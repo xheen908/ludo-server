@@ -27,8 +27,9 @@ function socketHandler(io, waitingQueues, rooms, colorsByMode) {
       const roomId = uuidv4();
       const gameState = initialGameState(needed);
 
-      const assignedPlayers = playersForThisRoom.map((socketId, idx) => ({
-        socketId,
+      const assignedPlayers = playersForThisRoom.map((pData, idx) => ({
+        socketId: pData.socketId,
+        avatar: pData.avatar || '🦊',
         color: colorsByMode[needed][idx],
       }));
 
@@ -43,6 +44,7 @@ function socketHandler(io, waitingQueues, rooms, colorsByMode) {
         if (socket) {
           socket.join(roomId);
           rooms[roomId].gameState.players[player.color].socketId = player.socketId;
+          rooms[roomId].gameState.players[player.color].avatar = player.avatar; // Avatar speichern
           socket.emit("roomAssigned", {
             roomId,
             color: player.color,
@@ -96,13 +98,18 @@ function socketHandler(io, waitingQueues, rooms, colorsByMode) {
       io.emit("updateRooms", rooms);
     });
 
-    socket.on("joinQueue", (mode) => {
+    socket.on("joinQueue", (data) => {
+      const mode = typeof data === 'object' ? data.mode : data;
+      const avatar = typeof data === 'object' ? data.avatar : '🦊';
       const validMode = [2, 4].includes(mode) ? mode : 4;
-      waitingQueues[validMode].push(socket.id);
+      
+      waitingQueues[validMode].push({ socketId: socket.id, avatar });
+      console.log(`Queue Update: Client ${socket.id} joined ${validMode}-player queue with avatar ${avatar}`);
       checkQueue(validMode);
     });
 
-    socket.on("startSingleplayer", () => {
+    socket.on("startSingleplayer", (data) => {
+      const avatar = typeof data === 'object' ? data.avatar : '🦊';
       const roomId = "sp_" + uuidv4();
       const needed = 2; // Singleplayer is always a 1v1 vs the Bot!
       const gameState = initialGameState(needed);
@@ -117,6 +124,11 @@ function socketHandler(io, waitingQueues, rooms, colorsByMode) {
       socket.join(roomId);
       const playerColor = colorsByMode[needed][0]; // Usually 'red'
       rooms[roomId].gameState.players[playerColor].socketId = socket.id;
+      rooms[roomId].gameState.players[playerColor].avatar = avatar; // Avatar setzen
+      
+      // Der Bot bekommt standardmäßig den Roboter-Avatar
+      const botColor = colorsByMode[needed][1];
+      rooms[roomId].gameState.players[botColor].avatar = '🤖';
       
       socket.emit("roomAssigned", {
         roomId,
@@ -193,7 +205,7 @@ function socketHandler(io, waitingQueues, rooms, colorsByMode) {
     socket.on("disconnect", () => {
       // Aus Warteschlange entfernen
       for (const mode of [2, 4]) {
-        const idx = waitingQueues[mode].indexOf(socket.id);
+        const idx = waitingQueues[mode].findIndex(p => p === socket.id || p?.socketId === socket.id);
         if (idx !== -1) {
           waitingQueues[mode].splice(idx, 1);
           break;

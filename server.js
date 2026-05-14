@@ -75,12 +75,6 @@ app.get("/admin/room/:roomId", (req, res) => {
   });
 });
 
-app.use('/ludo', express.static(path.join(__dirname, 'ludo-app', 'dist')));
-
-// Fallback: Für alle Routen unter /demo wird index.html ausgeliefert
-app.get('/ludo/*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'ludo-app', 'dist', 'index.html'));
-});
 
 // ---------------------------------
 // Initialisiere Socket-IO in einer separaten Datei

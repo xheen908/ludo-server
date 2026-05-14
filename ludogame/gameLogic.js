@@ -76,6 +76,40 @@ function getPossibleMoves(room, playerColor, roll) {
 }
 
 
+// Hilfsfunktion: Prüft, ob Zielkoordinaten mit gegnerischer Figur übereinstimmen
+function doesPosMatchOpponent(gameState, playerColor, targetCoords) {
+  for (const color in gameState.players) {
+    if (color !== playerColor) {
+      const opponent = gameState.players[color];
+      const matches = opponent.pieces.some((opponentPos) => {
+        if (opponentPos <= 0) return false;
+        const oppCoords = PATHS[color][opponentPos - 1];
+        return JSON.stringify(oppCoords) === JSON.stringify(targetCoords);
+      });
+      if (matches) return true;
+    }
+  }
+  return false;
+}
+
+// Hilfsfunktion: Prüft, ob der Zug einer Figur mit gegebenem Würfelwurf zu einem Schlagen führt
+function checkMoveKicks(gameState, playerColor, pieceIndex, roll) {
+  const player = gameState.players[playerColor];
+  const position = player.pieces[pieceIndex];
+  
+  let newPos;
+  if (position === 0 && roll === 6) {
+    newPos = 1;
+  } else if (position > 0 && position + roll <= PATHS[playerColor].length) {
+    newPos = position + roll;
+  } else {
+    return false;
+  }
+
+  const targetCoords = PATHS[playerColor][newPos - 1];
+  return doesPosMatchOpponent(gameState, playerColor, targetCoords);
+}
+
 // Bewegt eine spezifische Figur und handhabt Kollisionen
 // Bewegt eine spezifische Figur und handhabt Kollisionen
 function movePiece(room, gameState, playerColor, pieceIndex, roll) {
@@ -207,10 +241,33 @@ function applyMove(gameState, moveData, roomId, socketId, rooms) {
         }
       
         const { pieceIndex } = moveData;
+        
+        // STRAFE-CHECK ("Pusten"):
+        // Finde alle Figuren aus possibleMoves, die zu einem Schlagen geführt HÄTTEN
+        const kickingPieceIndices = (gameState.possibleMoves || []).filter(idx => 
+          checkMoveKicks(gameState, playerColor, idx, gameState.dice)
+        );
+
+        const couldHaveKicked = kickingPieceIndices.length > 0;
+        const choseToKick = kickingPieceIndices.includes(pieceIndex);
+
+        // Führe den eigentlichen Zug des Spielers aus
         const moveResult = movePiece(room, newState, playerColor, pieceIndex, newState.dice);
       
         if (!moveResult.success) {
           return { ...newState, error: moveResult.message };
+        }
+
+        // Bestrafung: Wenn er hätte schlagen MÜSSEN, aber stattdessen eine andere Figur bewegt hat!
+        if (couldHaveKicked && !choseToKick) {
+          kickingPieceIndices.forEach(kickingIdx => {
+            // Bestrafe die Figur, die hätte schlagen können, und schicke sie zurück in die Basis!
+            newState.players[playerColor].pieces[kickingIdx] = 0;
+            console.log(`🔥 PUSTEN: ${playerColor}'s Figur ${kickingIdx + 1} wurde gepustet (Zurück zur Basis)!`);
+          });
+          
+          // Setze eine prominente Strafnachricht vor die Standardnachricht
+          newState.message = `Strafe! ⚠️ Du hast nicht geschlagen - deine Figur${kickingPieceIndices.length > 1 ? 'en wurden' : ' wurde'} gepustet! ` + newState.message;
         }
       
         // Sieger-Check
