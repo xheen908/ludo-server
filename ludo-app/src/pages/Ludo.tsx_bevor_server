@@ -1,0 +1,96 @@
+import React, { useEffect, useRef, useState } from "react";
+import { Canvas, useLoader, useFrame } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
+import { Physics } from '@react-three/cannon';
+import { IonPage, IonContent, IonButton } from "@ionic/react";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import Figur from "../assets/models/figur2.stl";
+import DiceOutlay from "../assets/models/diceOutlay2.stl"
+import DiceInlay from "../assets/models/diceInlay2.stl"
+import "./Ludo.css";
+import LudoLogic from "./Ludo/LudoLogic"; // Importiere die Spiellogik
+import PhysicalDice from "./Ludo/PhysicalDice";
+import LudoBoard from "./Ludo/LudoBoard";
+
+
+
+const Ludo = () => {
+  const {
+    players,                // Die Spieler und deren Steine
+    currentPlayer,          // Der aktuelle Spieler
+    message,                // Die Nachricht (z.B. "Red starts the game!")
+    dice,                   // Das Ergebnis des Würfels
+    rollDice,               // Die Funktion zum Würfeln
+    checkWinner,            // Überprüft, ob ein Spieler gewonnen hat
+    isAnimating,            // Ob die Animation läuft
+    setIsAnimating,         // Funktion zum Starten/Stoppen der Animation
+  } = LudoLogic();         // Hier wird die Spiellogik genutzt
+
+  const [diceResult, setDiceResult] = useState(null); // Speichert das Ergebnis des Würfels
+
+  useEffect(() => {
+    // Überprüfe, ob ein Spieler gewonnen hat
+    const winnerMessage = checkWinner();
+    if (winnerMessage) {
+      alert(winnerMessage);  // Eine Gewinnmeldung anzeigen
+    }
+  }, [players]);  // Überwacht Änderungen an den Spielern
+
+  // Diese Funktion wird an die PhysicalDice-Komponente übergeben
+  const handleRoll = (result) => {
+    console.log("Würfelergebnis:", result); // Debugging: Überprüfe das Ergebnis
+    setDiceResult(result);
+  };
+
+  return (
+    <IonPage>
+      <Header title="3D Ludo" />
+      <IonContent fullscreen>
+        <div className="ludo-container">
+          <h1>{message}</h1>
+          <h2>Current Player: {currentPlayer}</h2>
+          <h3>Dice Roll: {dice}</h3>
+
+          <Canvas camera={{ position: [0, 15, 15], fov: 50 }} shadows style={{ width: "100%", height: "500px" }}>
+  <ambientLight intensity={0.5} />
+  <directionalLight
+    position={[10, 10, 10]}
+    castShadow
+    shadow-mapSize-width={2048}
+    shadow-mapSize-height={2048}
+    shadow-camera-left={-15}
+    shadow-camera-right={15}
+    shadow-camera-top={15}
+    shadow-camera-bottom={-15}
+  />
+  <OrbitControls />
+  <Physics>
+  <LudoBoard
+  isAnimating={isAnimating}
+  setIsAnimating={setIsAnimating}
+  players={players} // Spieler-Daten aus der Logik
+  Figur={Figur}
+/>
+<PhysicalDice 
+  position={[0, 3, 0]} 
+  outlayPath={DiceOutlay} 
+  inlayPath={DiceInlay} 
+  onRoll={handleRoll} // Hier wird die Funktion übergeben
+/>
+  </Physics>
+</Canvas>
+
+          {/* Button für den Wurf */}
+          <IonButton expand="block" onClick={rollDice}>Roll Dice</IonButton>
+          <IonButton expand="block" onClick={() => setIsAnimating(true)}>Start Animation</IonButton>
+          <IonButton expand="block" onClick={() => setIsAnimating(false)}>Stop Animation</IonButton>
+        </div>
+      </IonContent>
+      <Footer text="© 2024 Slot Heaven" />
+    </IonPage>
+  );
+};
+
+
+export default Ludo;

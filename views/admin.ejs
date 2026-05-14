@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ludo Admin Panel</title>
+  <link rel="stylesheet" href="/css/admin.css">
+  <style>
+    body { font-family: sans-serif; margin: 20px; }
+    .container { max-width: 1000px; margin: auto; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+    th { background-color: #f9f9f9; }
+    a { color: #007bff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="logo-container">
+    <img src="/img/ludoLogo.png" alt="Ludo Logo" class="logo">
+  </div>
+  <div class="container">
+    <a href="/" class="back-link">← Zurück</a>
+    <h1>Ludo Admin Panel</h1>
+
+    <h2>Online Players: <%= serverStatus.onlinePlayers %></h2>
+
+
+    <h2>Warteschlangen:</h2>
+    <ul>
+      <li>2er-Queue: <%= waitingQueues[2].length %> Spieler (<%= waitingQueues[2].join(", ") %>)</li>
+      <li>4er-Queue: <%= waitingQueues[4].length %> Spieler (<%= waitingQueues[4].join(", ") %>)</li>
+    </ul>
+
+    <h2>Laufende Räume:</h2>
+    <% if (Object.keys(rooms).length === 0) { %>
+      <p>Keine laufenden Räume.</p>
+    <% } else { %>
+      <table>
+        <thead>
+          <tr>
+            <th>Raum ID</th>
+            <th>Mode</th>
+            <th>Anzahl Spieler</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for (let roomId in rooms) { %>
+            <tr>
+              <td><%= roomId %></td>
+              <td><%= rooms[roomId].mode %></td>
+              <!-- Anpassung je nach Struktur -->
+              <td>
+                <% if (Array.isArray(rooms[roomId].players)) { %>
+                  <%= rooms[roomId].players.length %>
+                <% } else if (typeof rooms[roomId].players === 'object' && rooms[roomId].players !== null) { %>
+                  <%= Object.keys(rooms[roomId].players).length %>
+                <% } else { %>
+                  0
+                <% } %>
+              </td>
+              <td><a href="/admin/room/<%= roomId %>">Details anzeigen</a></td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    <% } %>
+  </div>
+</body>
+</html>

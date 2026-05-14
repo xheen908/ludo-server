@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ludo Server Info</title>
+  <!-- Hier das ausgelagerte CSS einbinden -->
+  <link rel="stylesheet" href="/public/css/index.css">
+</head>
+<body>
+  <div class="logo-container">
+    <img src="/public/img/ludoLogo.png" alt="Viier Logo" class="logo">
+  </div>
+  <div class="status-title">
+    Server Status
+    <div class="status-dot"></div>
+  </div>
+  <div class="status-container">
+    <div class="status-box">
+      <h3>Online Players: <%= serverStatus.onlinePlayers %></h3>
+    </div>
+    <div class="status-box">
+      <h3>Active Rooms: <%= serverStatus.activeRooms %></h3>
+    </div>
+  </div>
+  
+  <a class="download-link" href="/public/apk/ludobeta-1.0.5.apk" download>
+    Download APK
+  </a>
+  <a class="demo-link" href="/ludo">Play Demo</a>
+  
+  <a class="admin-link" href="/admin">Admin Dashboard</a>
+</body>
+</html>

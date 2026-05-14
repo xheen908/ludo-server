@@ -1,0 +1,88 @@
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(120deg, #4facfe, #006efe);
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+  .container { 
+    max-width: 1000px; 
+    margin: auto; 
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    
+  }
+  h1 {
+    text-align: center;
+    color: #333;
+  }
+  
+  section {
+    background: #fff;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  h2 {
+    color: #555;
+  }
+  
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  li {
+    background: #e2e2e2;
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 4px;
+  }
+  .logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo {
+    max-width: 100px;
+    height: auto;
+}
+.back-link { 
+    margin-bottom: 20px; 
+    display: inline-block; 
+    text-decoration: none;
+    color: #333;
+  }
+  .back-link:hover {
+    text-decoration: underline;
+  }
+  .player-dot {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px; /* Abstand zwischen Punkt und Spielernamen */
+    vertical-align: middle;
+  }
+  
+  /* Farben für die verschiedenen Spieler */
+  .player-red {
+    background-color: #f44336; /* Rot */
+  }
+  
+  .player-green {
+    background-color: #4caf50; /* Grün */
+  }
+  
+  .player-blue {
+    background-color: #2196f3; /* Blau */
+  }
+  
+  .player-yellow {
+    background-color: #ffc107; /* Gelb */
+  }
+  

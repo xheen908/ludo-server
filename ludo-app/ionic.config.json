@@ -1,0 +1,7 @@
+{
+  "name": "ludobeta",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}

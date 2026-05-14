@@ -1,0 +1,94 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: linear-gradient(120deg, #4facfe, #006efe);
+    color: white;
+    padding: 20px;
+    margin: 0;
+    min-height: 100vh;
+    box-sizing: border-box;
+  }
+  .logo-container {
+    margin-bottom: 20px;
+  }
+  .logo {
+    max-width: 150px;
+    height: auto;
+  }
+  .status-title {
+    position: relative;
+    display: inline-block;
+    font-size: 2rem;
+  }
+  .status-dot {
+    position: absolute;
+    top: 50%;
+    left: 105%;
+    transform: translate(-50%, -50%);
+    width: 15px;
+    height: 15px;
+    background-color: green;
+    border-radius: 50%;
+    z-index: -4;
+  }
+  .status-box {
+    display: inline-block;
+    padding: 20px;
+    margin: 10px;
+    color: #333;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  .status-box h3 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+  .download-link {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 1rem;
+  }
+  .download-link:hover {
+    background-color: #0056b3;
+  }
+  .admin-link {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 1rem;
+  }
+  .admin-link:hover {
+    background-color: #0056b3;
+  }
+  footer {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+    position: relative;
+    width: 100%;
+  }
+  .demo-link {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 1rem;
+  }
+  .demo-link:hover {
+    background-color: #0056b3;
+  }

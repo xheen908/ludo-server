@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Raum <%= roomId %> Details</title>
+  <link rel="stylesheet" href="/css/room.css">
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      margin: 20px; 
+      background-color: #f5f5f5;
+    }
+    .container { 
+      max-width: 1000px; 
+      margin: auto; 
+      background-color: #fff;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .back-link { 
+      margin-bottom: 20px; 
+      display: inline-block; 
+      text-decoration: none;
+      color: #333;
+    }
+    .back-link:hover {
+      text-decoration: underline;
+    }
+    h1, h2 { color: #333; }
+    table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      margin-top: 20px; 
+    }
+    th, td { 
+      border: 1px solid #ccc; 
+      padding: 10px; 
+      text-align: left; 
+    }
+    th { 
+      background-color: #f9f9f9; 
+    }
+    /* Spielbrett-Stile */
+    .game-board {
+      display: grid;
+      grid-template-columns: repeat(11, 25px); /* 11 Spalten mit 30px Breite */
+      grid-template-rows: repeat(11, 25px);    /* 11 Reihen mit 30px Höhe */
+      gap: 2px;
+      background-color: #ffff9a;
+      padding: 5px;
+      border: 4px solid rgb(224, 0, 0);  /* Der Rahmen bleibt */
+      border-radius: 10px;
+      /* Neu berechnete Breite und Höhe */
+      width: calc((26px * 11) + (2px * 10) + (5px * 2));  
+      height: calc((26px * 11) + (2px * 10) + (5px * 2)); 
+      box-sizing: border-box; /* Stellt sicher, dass der Rahmen und das Padding inkludiert sind */
+      margin: 20px 0; /* Zentriert das Spielfeld */
+      position: relative;
+    }
+    
+    .board-cell {
+      width: 20px;  /* Angepasst, um zur Grid-Größe zu passen */
+      height: 20px; /* Angepasst, um zur Grid-Größe zu passen */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      /* Entfernt: font-size und color für Zellindexnummer */
+    }
+    
+    .cell-empty { 
+      background-color: transparent; /* Transparent für leere Zellen */
+    }
+    .cell-path { 
+      background-color: #ffffff; 
+      border: 2px solid #000000;
+      border-radius: 50%;
+      position: relative;
+    }
+    .cell-start-red, .cell-start-green, .cell-start-blue, .cell-start-yellow {
+      background-color: #f44336; /* Rot */
+      border: 2px solid #b71c1c;
+      border-radius: 50%;
+      position: relative;
+    }
+    .cell-start-green {
+      background-color: #4caf50; /* Grün */
+      border: 2px solid #1b5e20;
+    }
+    .cell-start-blue {
+      background-color: #2196f3; /* Blau */
+      border: 2px solid #0d47a1;
+    }
+    .cell-start-yellow {
+      background-color: #ffc107; /* Gelb */
+      border: 2px solid #ff6f00;
+      border-radius: 50%;
+    }
+    .cell-end-red, .cell-end-green, .cell-end-blue, .cell-end-yellow {
+      background-color: #d32f2f; /* Dunkler Rot */
+      border: 2px solid #b71c1c;
+      border-radius: 50%;
+      position: relative;
+    }
+    .cell-end-green {
+      background-color: #388e3c; /* Dunkler Grün */
+      border: 2px solid #1b5e20;
+    }
+    .cell-end-blue {
+      background-color: #1976d2; /* Dunkler Blau */
+      border: 2px solid #0d47a1;
+    }
+    .cell-end-yellow {
+      background-color: #ffa000; /* Dunkler Gelb */
+      border: 2px solid #ff6f00;
+    }
+    .player-piece {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: bold;
+      font-size: 12px; /* Angepasst für bessere Sichtbarkeit */
+      z-index: 1;
+    }
+    .player-red { background-color: #f44336; }
+    .player-green { background-color: #4caf50; }
+    .player-blue { background-color: #2196f3; }
+    .player-yellow { background-color: #ffc107; color: #000; }
+    
+    /* Entfernte die Schrittzahlen-Stile */
+    
+    /* Entfernte die Zellindex-Stile */
+    
+    /* Responsive Anpassungen */
+    @media (max-width: 768px) {
+      .game-board {
+        grid-template-columns: repeat(11, 40px);
+        grid-template-rows: repeat(11, 40px);
+        width: calc((40px * 11) + (2px * 10) + (5px * 2));
+        height: calc((40px * 11) + (2px * 10) + (5px * 2)); 
+      }
+      .board-cell {
+        width: 40px;
+        height: 40px;
+        /* Entfernt: font-size für Zellindexnummer */
+      }
+      .player-piece {
+        width: 25px;
+        height: 25px;
+        top: 7px;
+        left: 7px;
+        font-size: 14px;
+      }
+      /* Entfernte die Schrittzahlen-Stile für responsive Ansicht */
+    }
+    .logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo {
+    max-width: 100px;
+    height: auto;
+}
+  </style>
+</head>
+<body>
+  <div class="logo-container">
+        <img src="/img/ludoLogo.png" alt="Ludo Logo" class="logo">
+      </div>
+  <div class="container">
+    <a href="/admin" class="back-link">← Zurück zum Admin Panel</a>
+    <h1>Raum <%= roomId %> Details</h1>
+    
+    <h2>Allgemeine Informationen</h2>
+    <p><strong>Mode:</strong> <%= room.mode %></p>
+    <p>
+        <strong>Aktueller Spieler:</strong>
+        <span class="player-dot <%= getPlayerClass(room.gameState.currentPlayer) %>"></span>
+        <%= room.gameState.currentPlayer.charAt(0).toUpperCase() + room.gameState.currentPlayer.slice(1) %>
+      </p>
+    <p><strong>Spielstatus:</strong> <%= room.gameState.gameOver ? "Beendet" : "Laufend" %></p>
+
+    <% if (room.gameState.message) { %>
+        <p class="game-message"><strong>Nachricht:</strong> <%= room.gameState.message %></p>
+      <% } %>
+    
+    <h2>Spieler</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Farbe</th>
+          <th>Socket ID</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for (let color in room.gameState.players) { %>
+          <tr>
+            <td>
+                <span class="player-dot <%= getPlayerClass(color) %>"></span>
+                <%= color.charAt(0).toUpperCase() + color.slice(1) %>
+              </td>
+            <td><%= room.gameState.players[color].socketId %></td>
+            <td><%= room.gameState.players[color].hasWon ? "Gewonnen" : "Im Spiel" %></td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+    
+    <h2>Aktueller Spielstatus</h2>
+    <div class="game-board">
+      <% 
+        // Definieren des BOARD_LAYOUT Arrays (11x11 Grid)
+        const BOARD_LAYOUT = [
+          [3, 3, 0, 0, 1, 1, 4, 0, 0, 4, 4],
+          [3, 3, 0, 0, 1, 8, 1, 0, 0, 4, 4],
+          [0, 0, 0, 0, 1, 8, 1, 0, 0, 0, 0],
+          [0, 0, 0, 0, 1, 8, 1, 0, 0, 0, 0],
+          [3, 1, 1, 1, 1, 8, 1, 1, 1, 1, 1],
+          [1, 7, 7, 7, 7, 0, 9, 9, 9, 9, 1],
+          [1, 1, 1, 1, 1, 6, 1, 1, 1, 1, 5],
+          [0, 0, 0, 0, 1, 6, 1, 0, 0, 0, 0],
+          [0, 0, 0, 0, 1, 6, 1, 0, 0, 0, 0],
+          [2, 2, 0, 0, 1, 6, 1, 0, 0, 5, 5],
+          [2, 2, 0, 0, 2, 1, 1, 0, 0, 5, 5],
+      ];
+
+        // Funktion zur Bestimmung der CSS-Klasse für jede Zelle
+        function getCellClass(cell) {
+          switch(cell) {
+            case 0:
+              return 'cell-empty';
+            case 1:
+              return 'cell-path';
+            case 2:
+              return 'cell-start-red';
+            case 3:
+              return 'cell-start-green';
+            case 4:
+              return 'cell-start-blue';
+            case 5:
+              return 'cell-start-yellow';
+            case 6:
+              return 'cell-end-red';
+            case 7:
+              return 'cell-end-green';
+            case 8:
+              return 'cell-end-blue';
+            case 9:
+              return 'cell-end-yellow';
+            default:
+              return 'cell-empty';
+          }
+        }
+
+        // Funktion zur Bestimmung der Spielerfarben für die Figuren
+        function getPlayerClass(color) {
+          switch(color.toLowerCase()) {
+            case 'red':
+              return 'player-red';
+            case 'grün':
+            case 'green':
+              return 'player-green';
+            case 'blue':
+              return 'player-blue';
+            case 'gelb':
+            case 'yellow':
+              return 'player-yellow';
+            default:
+              return '';
+          }
+        }
+
+        // Funktion zur Umkehrung der Schrittzuordnung
+        function invertStepMap(stepMap) {
+          const invertedMap = {};
+          for (let cellIndex in stepMap) {
+            const stepNumber = stepMap[cellIndex];
+            invertedMap[stepNumber] = parseInt(cellIndex);
+          }
+          return invertedMap;
+        }
+
+        // Definiere die Schrittzuordnung für den roten Spieler
+        const stepMapRed = {
+          114:1, 103:2, 92:3, 81:4, 70:5, 69:6, 68:7, 67:8, 66:9,
+          55:10, 44:11, 45:12, 46:13, 47:14, 48:15, 37:16, 26:17,
+          15:18, 4:19, 5:20, 6:21, 17:22, 28:23, 39:24, 50:25,
+          51:26, 52:27, 53:28, 54:29, 65:30, 76:31, 75:32, 74:33,
+          73:34, 72:35, 83:36, 94:37, 105:38, 116:39, 115:40,
+          104:41, 93:42, 82:43, 71:44,
+        };
+
+        // Definiere die Schrittzuordnung für den grünen Spieler
+        const stepMapGreen = {
+          44:1, 45:2, 46:3, 47:4, 48:5, 37:6, 26:7, 15:8, 4:9,
+          5:10, 6:11, 17:12, 28:13, 39:14, 50:15, 51:16, 52:17,
+          53:18, 54:19, 65:20, 76:21, 75:22, 74:23, 73:24, 72:25,
+          83:26, 94:27, 105:28, 116:29, 115:30, 114:31, 103:32,
+          92:33, 81:34, 70:35, 69:36, 68:37, 67:38, 66:39, 55:40,
+          56:41, 57:42, 58:43, 59:44,
+        };
+
+        // Definiere die Schrittzuordnung für den gelben Spieler
+        const stepMapYellow = {
+          76:1, 75:2, 74:3, 73:4, 72:5, 83:6, 94:7, 105:8, 116:9,
+          115:10, 114:11, 103:12, 92:13, 81:14, 70:15, 69:16,
+          68:17, 67:18, 66:19, 55:20, 44:21, 45:22, 46:23, 47:24,
+          48:25, 37:26, 26:27, 15:28, 4:29, 5:30, 6:31, 17:32,
+          28:33, 39:34, 50:35, 51:36, 52:37, 53:38, 54:39, 65:40,
+          64:41, 63:42, 62:43, 61:44,
+        };
+
+        // Definiere die Schrittzuordnung für den blauen Spieler
+        const stepMapBlue = {
+          6:1, 17:2, 28:3, 39:4, 50:5, 51:6, 52:7, 53:8, 54:9,
+          65:10, 76:11, 75:12, 74:13, 73:14, 72:15, 83:16, 94:17,
+          105:18, 116:19, 115:20, 114:21, 103:22, 92:23, 81:24,
+          70:25, 69:26, 68:27, 67:28, 66:29, 55:30, 44:31, 45:32,
+          46:33, 47:34, 48:35, 37:36, 26:37, 15:38, 4:39, 5:40,
+          16:41, 27:42, 38:43, 49:44,
+        };
+
+        // Erstelle umgekehrte Schrittzuordnungen
+        const reverseStepMapRed = invertStepMap(stepMapRed);
+        const reverseStepMapGreen = invertStepMap(stepMapGreen);
+        const reverseStepMapYellow = invertStepMap(stepMapYellow);
+        const reverseStepMapBlue = invertStepMap(stepMapBlue);
+
+        // Erstelle ein Objekt, das die Positionen der Spieler enthält
+        const playerPositions = {};
+
+        // Funktion zur Zuordnung der Spielfiguren auf die richtigen Zellen
+        function assignPlayerPositions(color, piecePos, reverseStepMap) {
+          const cellIndex = reverseStepMap[piecePos];
+          if (cellIndex !== undefined) { // Stelle sicher, dass der cellIndex existiert
+            if (!playerPositions[cellIndex]) {
+              playerPositions[cellIndex] = [];
+            }
+            playerPositions[cellIndex].push(color);
+          }
+        }
+
+        // Iteriere über alle Spieler und ordne ihre Stücke zu
+        for (let color in room.gameState.players) {
+          const player = room.gameState.players[color];
+          if (player.pieces && Array.isArray(player.pieces)) {
+            player.pieces.forEach(piecePos => {
+              if (piecePos > 0) { // Position 0 überspringen
+                let reverseStepMap;
+                switch(color.toLowerCase()) {
+                  case 'red':
+                    reverseStepMap = reverseStepMapRed;
+                    break;
+                  case 'grün':
+                  case 'green':
+                    reverseStepMap = reverseStepMapGreen;
+                    break;
+                  case 'blue':
+                    reverseStepMap = reverseStepMapBlue;
+                    break;
+                  case 'gelb':
+                  case 'yellow':
+                    reverseStepMap = reverseStepMapYellow;
+                    break;
+                  default:
+                    reverseStepMap = null;
+                }
+                if (reverseStepMap) {
+                  assignPlayerPositions(color, piecePos, reverseStepMap);
+                }
+              }
+            });
+          }
+        }
+      %>
+    
+      <% BOARD_LAYOUT.forEach((row, rowIndex) => { %>
+        <% row.forEach((cell, colIndex) => { 
+          const cellClass = getCellClass(cell);
+          const cellIndex = rowIndex * BOARD_LAYOUT[0].length + colIndex;
+          const playersInCell = playerPositions[cellIndex];
+        %>
+          <div class="board-cell <%= cellClass %>">
+            <!-- Schrittzahlen und Zellindex entfernt -->
+            
+            <!-- Spielerpositionen anzeigen -->
+            <% if (playersInCell) { 
+                playersInCell.forEach(color => { %>
+                  <div class="player-piece <%= getPlayerClass(color) %>">
+                    <%= color.charAt(0).toUpperCase() %>
+                  </div>
+              <% }) } %>
+          </div>
+        <% }) %>
+      <% }) %>
+    </div>
+
+     <!-- Spielerpositionen anzeigen 
+    <h2>JSON-Darstellung des Spielzustands</h2>
+    <pre><%= JSON.stringify(room.gameState, null, 2) %></pre>
+    -->
+    
+  </div>
+</body>
+</html>
