@@ -226,6 +226,7 @@ function applyMove(gameState, moveData, roomId, socketId, rooms) {
       const roll = Math.floor(Math.random() * 6) + 1;
       newState.dice = roll;
       newState.rollId = Date.now().toString() + '-' + Math.random().toString(36).substring(2, 9);
+      newState.swipeVector = moveData.swipeVector || null;
       newState.message = `${newState.currentPlayer} hat eine ${roll} gewürfelt!`;
       console.log(`${newState.currentPlayer} hat eine ${roll} gewürfelt.`);
 
