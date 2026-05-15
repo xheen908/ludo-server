@@ -202,6 +202,10 @@ function socketHandler(io, waitingQueues, rooms, colorsByMode) {
       }
     });
 
+    socket.on("playerReaction", ({ roomId, reaction, playerColor }) => {
+      socket.to(roomId).emit("playerReaction", { reaction, playerColor });
+    });
+
     socket.on("disconnect", () => {
       // Aus Warteschlange entfernen
       for (const mode of [2, 4]) {
